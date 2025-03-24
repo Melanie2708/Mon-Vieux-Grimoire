@@ -1,6 +1,17 @@
 const express = require("express");
+const mongoose = require("mongoose");
+
+const book = require("./models/book");
 
 const app = express();
+
+mongoose
+  .connect("mongodb+srv://Melanie:Melanie27@cluster0.2pkoa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connexion à MongoDB réussie !"))
+  .catch(() => console.log("Connexion à MongoDB échouée !"));
 
 app.use(express.json());
 
@@ -14,33 +25,41 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post("/api/books", (req, res, next) => {
-  console.log(req.body);
-  res.status(201).json({
-    message: "Objet créé !",
+app.post("/api/book", (req, res, next) => {
+  delete req.body._id;
+  const book = new Book({
+    ...req.body,
   });
+  book
+    .save()
+    .then(() => res.status(201).json({ message: "Objet enregistré !" }))
+    .catch((error) => res.status(400).json({ error }));
 });
 
-app.get("/api/books", (req, res, next) => {
-  const books = [
-    {
-      _id: "oeihfzeoi",
-      title: "Mon premier objet",
-      description: "Les infos de mon premier objet",
-      imageUrl: "https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg",
-      price: 4900,
-      userId: "qsomihvqios",
-    },
-    {
-      _id: "oeihfzeomoihi",
-      title: "Mon deuxième objet",
-      description: "Les infos de mon deuxième objet",
-      imageUrl: "https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg",
-      price: 2900,
-      userId: "qsomihvqios",
-    },
-  ];
-  res.status(200).json(books);
+app.put("/api/book/:id", (req, res, next) => {
+  book
+    .updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
+    .then(() => res.status(200).json({ message: "Objet modifié !" }))
+    .catch((error) => res.status(400).json({ error }));
+});
+
+app.delete("/api/book/:id", (req, res, next) => {
+  book
+    .deleteOne({ _id: req.params.id })
+    .then(() => res.status(200).json({ message: "Objet supprimé !" }))
+    .catch((error) => res.status(400).json({ error }));
+});
+
+app.get("/api/book/:id", (req, res, next) => {
+  Book.findOne({ _id: req.params.id })
+    .then((book) => res.status(200).json(book))
+    .catch((error) => res.status(404).json({ error }));
+});
+
+app.get("/api/book", (req, res, next) => {
+  Books.find()
+    .then((things) => res.status(200).json(things))
+    .catch((error) => res.status(400).json({ error }));
 });
 
 module.exports = app;
