@@ -1,10 +1,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
+const fs = require("fs").promises;
 
 const bookRoutes = require("./routes/books.route");
 const userRoutes = require("./routes/users.route");
 
 const app = express();
+
+// Création du dossier images si celui ci n'existe pas
+fs.mkdir(path.join(__dirname, "images"), { recursive: true })
+  .then(() => console.log("Dossier images crée"))
+  .catch((error) => console.log(`Dossier images non crée. Erreur : ${error}`));
 
 mongoose
   .connect("mongodb+srv://Melanie:Melanie27@cluster0.2pkoa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
@@ -28,5 +35,6 @@ app.use((req, res, next) => {
 
 app.use("/api/books", bookRoutes);
 app.use("/api/auth", userRoutes);
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 module.exports = app;
