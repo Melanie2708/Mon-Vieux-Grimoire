@@ -79,6 +79,8 @@ exports.rateBook = (req, res, next) => {
       res.status(400).json({ message: "L'utilisateur a déjà noté le livre !" });
     } else {
       book.ratings.push({ userId: req.auth.userId, grade: req.body.rating });
+      const moyenne = book.ratings.reduce((acc, rate) => acc + rate.grade, 0);
+      book.averageRating = moyenne / book.ratings.length;
       book
         .save()
         .then(() => res.status(201).json(book))
@@ -86,4 +88,5 @@ exports.rateBook = (req, res, next) => {
     }
   });
 };
+
 exports.getBestBooks = (req, res, next) => {};
