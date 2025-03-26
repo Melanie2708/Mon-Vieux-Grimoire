@@ -74,19 +74,29 @@ exports.deleteBook = (req, res, next) => {
 };
 
 exports.rateBook = (req, res, next) => {
-  Book.findOne({ _id: req.params.id }).then((book) => {
-    if (book.ratings.find((rate) => rate.userId === req.auth.userId)) {
-      res.status(400).json({ message: "L'utilisateur a déjà noté le livre !" });
-    } else {
-      book.ratings.push({ userId: req.auth.userId, grade: req.body.rating });
-      const moyenne = book.ratings.reduce((acc, rate) => acc + rate.grade, 0);
-      book.averageRating = moyenne / book.ratings.length;
-      book
-        .save()
-        .then(() => res.status(201).json(book))
-        .catch((error) => res.status(400).json({ error }));
-    }
-  });
+  Book.findOne({ _id: req.params.id })
+    .then((book) => {
+      if (book.ratings.find((rate) => rate.userId === req.auth.userId)) {
+        res.status(400).json({ message: "L'utilisateur a déjà noté le livre !" });
+      } else {
+        book.ratings.push({ userId: req.auth.userId, grade: req.body.rating });
+        const moyenne = book.ratings.reduce((acc, rate) => acc + rate.grade, 0);
+        book.averageRating = moyenne / book.ratings.length;
+        book
+          .save()
+          .then(() => res.status(201).json(book))
+          .catch((error) => res.status(400).json({ error }));
+      }
+    })
+    .catch((error) => {
+      res.status(500).json({ error });
+    });
 };
 
-exports.getBestBooks = (req, res, next) => {};
+exports.getBestBooks = (req, res, next) => {
+  Book.find()
+    .sort({ averageRating: -1 })
+    .limit(3)
+    .then((books) => res.status(200).json(books))
+    .catch((error) => res.status(400).json({ error }));
+};
