@@ -72,3 +72,18 @@ exports.deleteBook = (req, res, next) => {
       res.status(500).json({ error });
     });
 };
+
+exports.rateBook = (req, res, next) => {
+  Book.findOne({ _id: req.params.id }).then((book) => {
+    if (book.ratings.find((rate) => rate.userId === req.auth.userId)) {
+      res.status(400).json({ message: "L'utilisateur a déjà noté le livre !" });
+    } else {
+      book.ratings.push({ userId: req.auth.userId, grade: req.body.rating });
+      book
+        .save()
+        .then(() => res.status(201).json(book))
+        .catch((error) => res.status(400).json({ error }));
+    }
+  });
+};
+exports.getBestBooks = (req, res, next) => {};
