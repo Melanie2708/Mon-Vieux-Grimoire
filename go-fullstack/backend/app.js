@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const fs = require("fs").promises;
+require("dotenv").config();
+const dbConnection = process.env.DB_PARAMETER;
 
 const bookRoutes = require("./routes/books.route");
 const userRoutes = require("./routes/users.route");
@@ -14,7 +16,7 @@ fs.mkdir(path.join(__dirname, "images"), { recursive: true })
   .catch((error) => console.log(`Dossier images non crée. Erreur : ${error}`));
 
 mongoose
-  .connect("mongodb+srv://Melanie:Melanie27@cluster0.2pkoa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
+  .connect(dbConnection, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
