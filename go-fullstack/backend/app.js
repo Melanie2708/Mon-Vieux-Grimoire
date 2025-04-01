@@ -16,10 +16,7 @@ fs.mkdir(path.join(__dirname, "images"), { recursive: true })
   .catch((error) => console.log(`Dossier images non crée. Erreur : ${error}`));
 
 mongoose
-  .connect(dbConnection, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(dbConnection)
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch(() => console.log("Connexion à MongoDB échouée !"));
 
