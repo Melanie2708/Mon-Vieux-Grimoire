@@ -15,6 +15,7 @@ fs.mkdir(path.join(__dirname, "images"), { recursive: true })
   .then(() => console.log("Dossier images crée"))
   .catch((error) => console.log(`Dossier images non crée. Erreur : ${error}`));
 
+// Connexion à la base de données
 mongoose
   .connect(dbConnection)
   .then(() => console.log("Connexion à MongoDB réussie !"))
@@ -22,6 +23,7 @@ mongoose
 
 app.use(express.json());
 
+// Ajout des en-tête dans la réponse
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -32,6 +34,7 @@ app.use((req, res, next) => {
   next();
 });
 
+// Définition de la base des routes
 app.use("/api/books", bookRoutes);
 app.use("/api/auth", userRoutes);
 app.use("/images", express.static(path.join(__dirname, "images")));
